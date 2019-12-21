@@ -94,6 +94,6 @@ def getTotalTVSize():
 if __name__ == "__main__":
     # getTotalTVSize()
     # getTotalMovieSize()
-    # downloadMovies()
+    downloadMovies()
 
 
