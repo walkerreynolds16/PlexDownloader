@@ -8,7 +8,7 @@ import os
 
 
 def downloadMovie(url, path):
-    filename = wget.download(url)
+    filename = wget.download(url, path)
     print(filename)
 
 def formatSizeInteger(num, suffix='B'):
@@ -19,15 +19,11 @@ def formatSizeInteger(num, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 def downloadMovies():
-
-    # outFile = open("output.txt", "w")
-
     url = 'http://{}:{}/library/sections/4/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
 
     response = requests.get(url)
     responseDict = xmltodict.parse(response.content)
 
-    # outFile.write(json.dumps(responseDict))
 
     count = 1
 
