@@ -3,3 +3,4 @@ output*
 *.tmp
 config.py
 .DS_Store
+/*

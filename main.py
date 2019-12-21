@@ -106,12 +106,24 @@ def getTotalTVSize():
 
     print("Total size in movies = {}".format(formatSizeInteger(totalSize)))
 
+def deleteLocalTmpFiles():
+    currPath = os.getcwd()
+
+    listDir = os.listdir(currPath)
+
+    for item in listDir:
+        if item.endswith(".tmp"):
+            print("File {} being deleted".format(item))
+            os.remove(os.path.join(currPath, item))
+
 
 if __name__ == "__main__":
     # getTotalTVSize()
     # getTotalMovieSize()
-    downloadMovies()
-    # exists = os.path.exists('/Users/walker/repos/plex-downloader/2 Fast 2 Furious/2.Fast.2.Furious.2003.720p.BrRip.x264.YIFY+HI.mp4')
-    # exists = os.path.exists('/Users/walker/repos/plex-downloader/2 Fast 2 Furious/2.Fast.2.Furious.2003.720p.BrRip.x264.YIFY_HI.mp4')
-    
-    # print(exists)
+    try:
+        downloadMovies()
+
+    except KeyboardInterrupt as e:
+        deleteLocalTmpFiles()
+
+
