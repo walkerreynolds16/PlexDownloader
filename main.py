@@ -53,7 +53,7 @@ def downloadMovies():
         # print("New File Path = {}".format(newFilePath))
         
 
-        fileExists = os.path.exists(newFilePath.replace('+','_'))
+        fileExists = os.path.exists(newFilePath.replace('+','_').replace('!','_'))
 
         if(fileExists):
             print("{} already exists in {}, moving onto next movie".format(fileName, newDirPath))
