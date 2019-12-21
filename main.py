@@ -57,6 +57,7 @@ def downloadMovies():
 
         if(fileExists):
             print("{} already exists in {}, moving onto next movie".format(fileName, newDirPath))
+            count += 1
             continue
 
         makeFileDirectory(newDirPath)
