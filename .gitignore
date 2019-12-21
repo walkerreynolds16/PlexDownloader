@@ -2,3 +2,4 @@ output*
 /__pycache__
 *.tmp
 config.py
+.DS_Store
