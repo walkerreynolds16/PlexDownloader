@@ -44,20 +44,27 @@ def downloadMovies():
         totalMovies = len(responseDict['MediaContainer']['Video']) + 1
 
         fileName = getFileNameFromPath(movie['Media']['Part']['@file'])
+        # print("File Name = {}".format(fileName))
 
-        newDirPath = JIMS_PLEX_MOVIE_PATH + fileTitle
-        fileExists = checkIfFileExists(newDirPath, fileName)
+        newDirPath = JIMS_PLEX_MOVIE_PATH + fileTitle + '/'
+        # print("New Dir Path = {}".format(newDirPath))
+
+        newFilePath = newDirPath + fileName
+        # print("New File Path = {}".format(newFilePath))
+        
+
+        fileExists = os.path.exists(newFilePath.replace('+','_'))
 
         if(fileExists):
             print("{} already exists in {}, moving onto next movie".format(fileName, newDirPath))
             continue
 
-        newDir = makeFileDirectory(newDirPath)
+        makeFileDirectory(newDirPath)
 
-        print("Downloading {} - Size {} - Left to download ({}/{})".format(fileTitle, formattedFileSize, count, totalMovies))
+        print("Downloading {} - Location {} - Size {} - Left to download ({}/{})".format(fileTitle, newFilePath, formattedFileSize, count, totalMovies))
 
         downloadUrl = 'http://{}:{}{}?download=1&X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, mediaKey, PLEX_KEY)
-        downloadMovie(downloadUrl, newDir)
+        downloadMovie(downloadUrl, newDirPath)
 
         count += 1
 
@@ -68,8 +75,6 @@ def makeFileDirectory(newDirPath):
     except OSError as e:
         print ("Creation of the directory %s failed" % newDirPath)
         print(e)
-
-    return newDirPath
 
 def getTotalMovieSize():
     url = 'http://{}:{}/library/sections/4/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
@@ -106,5 +111,7 @@ if __name__ == "__main__":
     # getTotalTVSize()
     # getTotalMovieSize()
     downloadMovies()
-
-
+    # exists = os.path.exists('/Users/walker/repos/plex-downloader/2 Fast 2 Furious/2.Fast.2.Furious.2003.720p.BrRip.x264.YIFY+HI.mp4')
+    # exists = os.path.exists('/Users/walker/repos/plex-downloader/2 Fast 2 Furious/2.Fast.2.Furious.2003.720p.BrRip.x264.YIFY_HI.mp4')
+    
+    # print(exists)
