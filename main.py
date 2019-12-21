@@ -4,7 +4,7 @@ from config import *
 import json
 import xmltodict
 import os
-
+import ntpath
 
 
 def downloadMovie(url, path):
@@ -18,12 +18,19 @@ def formatSizeInteger(num, suffix='B'):
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
+def checkIfFileExists(directory, filename):
+    path = directory + filename
+    return os.path.exists(path)
+
+def getFileNameFromPath(path):
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)
+
 def downloadMovies():
     url = 'http://{}:{}/library/sections/4/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
 
     response = requests.get(url)
     responseDict = xmltodict.parse(response.content)
-
 
     count = 1
 
@@ -31,11 +38,21 @@ def downloadMovies():
     for movie in responseDict['MediaContainer']['Video']:
         mediaKey = movie['Media']['Part']['@key']
 
+
         fileTitle = movie['@title']
         formattedFileSize = formatSizeInteger(int(movie['Media']['Part']['@size']))
         totalMovies = len(responseDict['MediaContainer']['Video']) + 1
 
-        newDir = makeFileDirectory(JIMS_PLEX_MOVIE_PATH, fileTitle)
+        fileName = getFileNameFromPath(movie['Media']['Part']['@file'])
+
+        newDirPath = JIMS_PLEX_MOVIE_PATH + fileTitle
+        fileExists = checkIfFileExists(newDirPath, fileName)
+
+        if(fileExists):
+            print("{} already exists in {}, moving onto next movie".format(fileName, newDirPath))
+            continue
+
+        newDir = makeFileDirectory(newDirPath)
 
         print("Downloading {} - Size {} - Left to download ({}/{})".format(fileTitle, formattedFileSize, count, totalMovies))
 
@@ -45,15 +62,13 @@ def downloadMovies():
         count += 1
 
 
-def makeFileDirectory(directoryPath,fileTitle):
-    newDirPath = directoryPath + fileTitle
+def makeFileDirectory(newDirPath):
     try:
         os.mkdir(newDirPath)
     except OSError as e:
         print ("Creation of the directory %s failed" % newDirPath)
         print(e)
 
-    print ("Successfully created the directory %s " % newDirPath)
     return newDirPath
 
 def getTotalMovieSize():
