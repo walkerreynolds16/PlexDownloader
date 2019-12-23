@@ -32,7 +32,7 @@ def downloadMovies():
         newDirPath = JIMS_PLEX_MOVIE_PATH + fileTitle + '/'
         # print("New Dir Path = {}".format(newDirPath))
 
-        newFilePath = newDirPath + fileName.replace('+','_').replace('!','_').replace("–","___")
+        newFilePath = newDirPath + fileName.replace('+','_').replace('!','_').replace("–","___").replace("】", "___").replace("【", "___")
         # print("New File Path = {}".format(newFilePath))
     
 
@@ -103,7 +103,7 @@ def downloadTVShows():
                 # print("{} - {} - {}".format(episodesResponseDict['MediaContainer']['@title1'], seasonTitle, episode['@title']))
                 episodeTitle = episode['@title']
                 episodeFileName = utils.getFileNameFromPath(episode['Media']['Part']['@file'])
-                episodePath = seasonDirectory + episodeFileName.replace('+','_').replace('!','_').replace("–","___")
+                episodePath = seasonDirectory + episodeFileName.replace('+','_').replace('!','_').replace("–","___").replace("】", "___").replace("【", "___")
                 formattedFileSize = utils.formatSizeInteger(int(episode['Media']['Part']['@size']))
                 mediaKey = episode['Media']['Part']['@key']
 
