@@ -9,6 +9,7 @@ import utils
 
 
 def downloadMovies():
+    print("Downloading Movies...")
     url = 'http://{}:{}/library/sections/4/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
 
     response = requests.get(url)
@@ -38,7 +39,7 @@ def downloadMovies():
         fileExists = os.path.exists(newFilePath.replace('+','_').replace('!','_').replace("&#8211;","_"))
 
         if(fileExists):
-            print("{} already exists in {}, moving onto next movie".format(fileName, newDirPath))
+            # print("{} already exists in {}, moving onto next movie".format(fileName, newDirPath))
             count += 1
             continue
 
@@ -52,6 +53,7 @@ def downloadMovies():
         count += 1
 
 def downloadTVShows():
+    print("Downloading TV Shows...")
     # Get list of TV shows url
     # url = 'http://{}:{}/library/sections/3/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
 
@@ -109,7 +111,7 @@ def downloadTVShows():
 
                 fileExists = os.path.exists(episodePath.replace('+','_').replace('!','_').replace("&#8211;","_"))
                 if(fileExists):
-                    print("{} already exists, moving on...".format(episodePath))
+                    # print("{} already exists, moving on...".format(episodePath))
                     continue
 
                 print("Downloading {} - Location {} - Size {}".format(episodeTitle, episodePath, formattedFileSize))
@@ -127,7 +129,7 @@ if __name__ == "__main__":
     # getTotalTVSize()
     # getTotalMovieSize()
     try:
-        # downloadMovies()
+        downloadMovies()
         downloadTVShows()
 
     except KeyboardInterrupt as e:
