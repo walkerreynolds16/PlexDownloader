@@ -44,16 +44,12 @@ def downloadMovies():
             continue
         
 
-        # utils.makeFileDirectory(newDirPath)
+        utils.makeFileDirectory(newDirPath)
 
-        # print("Downloading {} - Location {} - Size {} - Left to download ({}/{})".format(fileTitle, newFilePath, formattedFileSize, count, totalMovies))
+        print("Downloading {} - Location {} - Size {} - Left to download ({}/{})".format(fileTitle, newFilePath, formattedFileSize, count, totalMovies))
 
-        # downloadUrl = 'http://{}:{}{}?download=1&X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, mediaKey, PLEX_KEY)
-        # utils.downloadMovie(downloadUrl, newDirPath)
-
-        print(fileTitle)
-
-
+        downloadUrl = 'http://{}:{}{}?download=1&X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, mediaKey, PLEX_KEY)
+        utils.downloadMovie(downloadUrl, newDirPath)
         count += 1
 
 def downloadTVShows():
