@@ -5,26 +5,8 @@ import json
 import xmltodict
 import os
 import ntpath
+import utils
 
-
-def downloadMovie(url, path):
-    filename = wget.download(url, path)
-    print(filename)
-
-def formatSizeInteger(num, suffix='B'):
-    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
-        if abs(num) < 1024.0:
-            return "%3.1f%s%s" % (num, unit, suffix)
-        num /= 1024.0
-    return "%.1f%s%s" % (num, 'Yi', suffix)
-
-def checkIfFileExists(directory, filename):
-    path = directory + filename
-    return os.path.exists(path)
-
-def getFileNameFromPath(path):
-    head, tail = ntpath.split(path)
-    return tail or ntpath.basename(head)
 
 def downloadMovies():
     url = 'http://{}:{}/library/sections/4/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
@@ -40,10 +22,10 @@ def downloadMovies():
 
 
         fileTitle = movie['@title']
-        formattedFileSize = formatSizeInteger(int(movie['Media']['Part']['@size']))
+        formattedFileSize = utils.formatSizeInteger(int(movie['Media']['Part']['@size']))
         totalMovies = len(responseDict['MediaContainer']['Video']) + 1
 
-        fileName = getFileNameFromPath(movie['Media']['Part']['@file'])
+        fileName = utils.getFileNameFromPath(movie['Media']['Part']['@file'])
         # print("File Name = {}".format(fileName))
 
         newDirPath = JIMS_PLEX_MOVIE_PATH + fileTitle + '/'
@@ -60,71 +42,96 @@ def downloadMovies():
             count += 1
             continue
 
-        makeFileDirectory(newDirPath)
+        utils.makeFileDirectory(newDirPath)
 
         print("Downloading {} - Location {} - Size {} - Left to download ({}/{})".format(fileTitle, newFilePath, formattedFileSize, count, totalMovies))
 
         downloadUrl = 'http://{}:{}{}?download=1&X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, mediaKey, PLEX_KEY)
-        downloadMovie(downloadUrl, newDirPath)
+        utils.downloadMovie(downloadUrl, newDirPath)
 
         count += 1
 
+def downloadTVShows():
+    # Get list of TV shows url
+    # url = 'http://{}:{}/library/sections/3/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
 
-def makeFileDirectory(newDirPath):
-    try:
-        os.mkdir(newDirPath)
-    except OSError as e:
-        print ("Creation of the directory %s failed" % newDirPath)
-        print(e)
+    # Get list of seasons from a show
+    # url = 'http://{}:{}/library/metadata/5991/children?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
 
-def getTotalMovieSize():
-    url = 'http://{}:{}/library/sections/4/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
-    response = requests.get(url)
-    responseDict = xmltodict.parse(response.content)
+    # Get list of episodes from season
+    # url = 'http://{}:{}/library/metadata/5992/children?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
 
-    totalSize = 0
+    getShowsURL = 'http://{}:{}/library/sections/3/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
 
-    for movie in responseDict['MediaContainer']['Video']:
-        size = int(movie['Media']['Part']['@size'])
-        totalSize += size
+    getShowsResponse = requests.get(getShowsURL)
+    responseDict = xmltodict.parse(getShowsResponse.content)
 
-    print("Total size in movies = {}".format(formatSizeInteger(totalSize)))
 
-def getTotalTVSize():
-    url = 'http://{}:{}/library/sections/3/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
-    outFile = open("outputTV.txt", "w")
+    for show in responseDict['MediaContainer']['Directory']:
+        showTitle = show['@title']
+        print(showTitle)
+        showDirectory = JIMS_PLEX_TV_PATH + showTitle + '/'
 
-    response = requests.get(url)
-    responseDict = xmltodict.parse(response.content)
+        # Make parent folder for the whole show
+        utils.makeFileDirectory(showDirectory)
 
-    outFile.write(json.dumps(responseDict))
+        # Get seasons data
+        seasonsKey = show['@key']
+        getSeasonsURL = 'http://{}:{}{}?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, seasonsKey, PLEX_KEY)
+        
+        getSeasonsResponse = requests.get(getSeasonsURL)
+        seasonsResponseDict = xmltodict.parse(getSeasonsResponse.content, force_list={'Directory'})
 
-    totalSize = 0
+        for season in seasonsResponseDict['MediaContainer']['Directory']:
+            if(season['@title'] == 'All episodes' or 'allLeaves' in season['@key']):
+                # We disregard the 'All episodes' season since we want to make directories for each season
+                continue
+            
+            seasonTitle = season['@title']
+            seasonDirectory = showDirectory + seasonTitle + '/'
+            utils.makeFileDirectory(seasonDirectory)
 
-    for movie in responseDict['MediaContainer']['Video']:
-        size = int(movie['Media']['Part']['@size'])
-        totalSize += size
+            episodesKey = season['@key']
+            getEpisodeURL = 'http://{}:{}{}?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, episodesKey, PLEX_KEY)
 
-    print("Total size in movies = {}".format(formatSizeInteger(totalSize)))
+            getEpisodesResponse = requests.get(getEpisodeURL)
+            episodesResponseDict = xmltodict.parse(getEpisodesResponse.content, force_list={'Video'})
 
-def deleteLocalTmpFiles():
-    currPath = os.getcwd()
+            for episode in episodesResponseDict['MediaContainer']['Video']:
+                # print("{} - {} - {}".format(episodesResponseDict['MediaContainer']['@title1'], seasonTitle, episode['@title']))
+                episodeTitle = episode['@title']
+                episodeFileName = utils.getFileNameFromPath(episode['Media']['Part']['@file'])
+                episodePath = seasonDirectory + episodeFileName
+                formattedFileSize = utils.formatSizeInteger(int(episode['Media']['Part']['@size']))
+                mediaKey = episode['Media']['Part']['@key']
 
-    listDir = os.listdir(currPath)
 
-    for item in listDir:
-        if item.endswith(".tmp"):
-            print("File {} being deleted".format(item))
-            os.remove(os.path.join(currPath, item))
+
+                fileExists = os.path.exists(episodePath.replace('+','_').replace('!','_'))
+                if(fileExists):
+                    print("{} already exists, moving on...".format(episodePath))
+                    continue
+
+                print("Downloading {} - Location {} - Size {}".format(episodeTitle, episodePath, formattedFileSize))
+
+                downloadUrl = 'http://{}:{}{}?download=1&X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, mediaKey, PLEX_KEY)
+                utils.downloadMovie(downloadUrl, episodePath)
+
+                
+
+
+
 
 
 if __name__ == "__main__":
     # getTotalTVSize()
     # getTotalMovieSize()
     try:
-        downloadMovies()
+        # downloadMovies()
+        downloadTVShows()
 
     except KeyboardInterrupt as e:
-        deleteLocalTmpFiles()
+        utils.deleteLocalTmpFiles()
+        utils.deleteTVTmpFiles(JIMS_PLEX_TV_PATH)
 
 
