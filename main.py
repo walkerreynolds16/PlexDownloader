@@ -32,16 +32,11 @@ def downloadMovies():
         newDirPath = JIMS_PLEX_MOVIE_PATH + fileTitle + '/'
         # print("New Dir Path = {}".format(newDirPath))
 
-        newFilePath = newDirPath + fileName
+        newFilePath = newDirPath + fileName.replace('+','_').replace('!','_').replace("–","___")
         # print("New File Path = {}".format(newFilePath))
-        
-        if(fileTitle == "John Wick: Chapter 3 – Parabellum"):
-            # print(os.listdir(newDirPath))
-            # print(fileName.replace("–","___"))
-            print(newFilePath.replace('+','_').replace('!','_').replace("–","___"))
-            print(os.path.abspath(os.listdir(newDirPath)[0]))
+    
 
-        fileExists = os.path.exists(newFilePath.replace('+','_').replace('!','_').replace("–","___"))
+        fileExists = os.path.exists(newFilePath)
 
         if(fileExists):
             # print("{} already exists in {}, moving onto next movie".format(fileName, newDirPath))
@@ -108,13 +103,13 @@ def downloadTVShows():
                 # print("{} - {} - {}".format(episodesResponseDict['MediaContainer']['@title1'], seasonTitle, episode['@title']))
                 episodeTitle = episode['@title']
                 episodeFileName = utils.getFileNameFromPath(episode['Media']['Part']['@file'])
-                episodePath = seasonDirectory + episodeFileName
+                episodePath = seasonDirectory + episodeFileName.replace('+','_').replace('!','_').replace("–","___")
                 formattedFileSize = utils.formatSizeInteger(int(episode['Media']['Part']['@size']))
                 mediaKey = episode['Media']['Part']['@key']
 
 
 
-                fileExists = os.path.exists(episodePath.replace('+','_').replace('!','_').replace("–","___"))
+                fileExists = os.path.exists(episodePath)
                 if(fileExists):
                     # print("{} already exists, moving on...".format(episodePath))
                     continue
