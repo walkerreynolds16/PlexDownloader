@@ -36,7 +36,7 @@ def downloadMovies():
         # print("New File Path = {}".format(newFilePath))
         
 
-        fileExists = os.path.exists(newFilePath.replace('+','_').replace('!','_').replace("&#8211;","_"))
+        fileExists = os.path.exists(newFilePath.replace('+','_').replace('!','_').replace("&","_").replace("#","_").replace(";","_"))
 
         if(fileExists):
             # print("{} already exists in {}, moving onto next movie".format(fileName, newDirPath))
@@ -109,7 +109,7 @@ def downloadTVShows():
 
 
 
-                fileExists = os.path.exists(episodePath.replace('+','_').replace('!','_').replace("&#8211;","_"))
+                fileExists = os.path.exists(episodePath.replace('+','_').replace('!','_').replace("&","_").replace("#","_").replace(";","_"))
                 if(fileExists):
                     # print("{} already exists, moving on...".format(episodePath))
                     continue
