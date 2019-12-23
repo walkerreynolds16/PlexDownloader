@@ -32,7 +32,7 @@ def downloadMovies():
         newDirPath = JIMS_PLEX_MOVIE_PATH + fileTitle + '/'
         # print("New Dir Path = {}".format(newDirPath))
 
-        newFilePath = newDirPath + fileName.replace('+','_').replace('!','_').replace("–","___").replace("】", "___").replace("【", "___").replace("é", "__")
+        newFilePath = newDirPath + fileName.replace('+','_').replace('!','_').replace("–","___").replace("】", "___").replace("【", "___").replace("é", "__").replace(",","_")
         # print("New File Path = {}".format(newFilePath))
     
 
@@ -42,13 +42,17 @@ def downloadMovies():
             # print("{} already exists in {}, moving onto next movie".format(fileName, newDirPath))
             count += 1
             continue
+        
 
-        utils.makeFileDirectory(newDirPath)
+        # utils.makeFileDirectory(newDirPath)
 
-        print("Downloading {} - Location {} - Size {} - Left to download ({}/{})".format(fileTitle, newFilePath, formattedFileSize, count, totalMovies))
+        # print("Downloading {} - Location {} - Size {} - Left to download ({}/{})".format(fileTitle, newFilePath, formattedFileSize, count, totalMovies))
 
-        downloadUrl = 'http://{}:{}{}?download=1&X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, mediaKey, PLEX_KEY)
-        utils.downloadMovie(downloadUrl, newDirPath)
+        # downloadUrl = 'http://{}:{}{}?download=1&X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, mediaKey, PLEX_KEY)
+        # utils.downloadMovie(downloadUrl, newDirPath)
+
+        print(fileTitle)
+
 
         count += 1
 
@@ -103,7 +107,7 @@ def downloadTVShows():
                 # print("{} - {} - {}".format(episodesResponseDict['MediaContainer']['@title1'], seasonTitle, episode['@title']))
                 episodeTitle = episode['@title']
                 episodeFileName = utils.getFileNameFromPath(episode['Media']['Part']['@file'])
-                episodePath = seasonDirectory + episodeFileName.replace('+','_').replace('!','_').replace("–","___").replace("】", "___").replace("【", "___").replace("é", "__")
+                episodePath = seasonDirectory + episodeFileName.replace('+','_').replace('!','_').replace("–","___").replace("】", "___").replace("【", "___").replace("é", "__").replace(",","_")
                 formattedFileSize = utils.formatSizeInteger(int(episode['Media']['Part']['@size']))
                 mediaKey = episode['Media']['Part']['@key']
 
