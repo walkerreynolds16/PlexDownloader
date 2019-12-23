@@ -37,7 +37,7 @@ def downloadMovies():
         
         if(fileTitle == "John Wick: Chapter 3 – Parabellum"):
             print(os.listdir(newDirPath))
-            print(fileName)
+            print(fileName.replace("–","___"))
 
         fileExists = os.path.exists(newFilePath.replace('+','_').replace('!','_').replace("–","___"))
 
