@@ -6,6 +6,7 @@ import xmltodict
 import os
 import ntpath
 import utils
+from datetime import datetime, time
 
 
 def downloadMovies():
@@ -19,6 +20,11 @@ def downloadMovies():
 
     # Download movies
     for movie in responseDict['MediaContainer']['Video']:
+        now = datetime.now().time()
+        if(now <= time(22,55) and now >= time(7,00)):
+            print("Not night, stopping downloads...")
+            exit()
+
         mediaKey = movie['Media']['Part']['@key']
 
 
@@ -54,15 +60,6 @@ def downloadMovies():
 
 def downloadTVShows():
     print("Downloading TV Shows...")
-    # Get list of TV shows url
-    # url = 'http://{}:{}/library/sections/3/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
-
-    # Get list of seasons from a show
-    # url = 'http://{}:{}/library/metadata/5991/children?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
-
-    # Get list of episodes from season
-    # url = 'http://{}:{}/library/metadata/5992/children?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
-
     getShowsURL = 'http://{}:{}/library/sections/3/all?X-Plex-Token={}'.format(PLEX_IP_ADDRESS, PLEX_PORT, PLEX_KEY)
 
     getShowsResponse = requests.get(getShowsURL)
